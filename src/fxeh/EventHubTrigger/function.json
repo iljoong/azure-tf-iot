@@ -1,0 +1,14 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "events",
+      "direction": "in",
+      "eventHubName": "testeh",
+      "cardinality": "many",
+      "connection": "RootManageSharedAccessKey_EVENTHUB",
+      "consumerGroup": "$Default"
+    }
+  ],
+  "disabled": false
+}

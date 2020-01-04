@@ -12,59 +12,61 @@ terraform init
 terraform apply
 ```
 
-## Configure and deploy manually
+> `fxurl` function app retrieves _function url_ of a function app without accessing Azure Portal.
 
-1. Configuring MS SQL
+## Setup and deploy manually
+
+1. Setup database (MS SQL)
 
     - add your IP in firewall rules
     - run following `sqlcmd`
 
         ```
-        sqlcmd -S <sqlsvr.database.windows.net> -d <dbname>  -U <username> -P <password> -Q "create table events (id bigint identity primary key, message nvarchar(max), timecreated datetime)"
+        sqlcmd -S <sqlsvr.database.windows.net> -d <dbname>  -U <username> -P <password> -Q "drop table events; create table events (id bigint identity primary key, message nvarchar(max), timecreated datetime)"
         ```
 
 2. Deploying applications manually
 
- 
-> use _out credentials_ for updating `username` and `password`
+    > update `username` and `password` from terraform _credentials output_ 
 
-```
-.\zipdeploy.ps1 -username '<fxeh username>' -password <fxeh password> -appname <fxeh name> -filepath .\assets\fxeh.zip
+    ```
+    .\zipdeploy.ps1 -username '<fxeh username>' -password <fxeh password> -appname <fxeh name> -filepath .\assets\fxeh.zip
 
-.\zipdeploy.ps1 -username '<webapp username>' -password <webapp password> -appname <webapp name> -filepath .\assets\apiapp.zip
-```
+    .\zipdeploy.ps1 -username '<webapp username>' -password <webapp password> -appname <webapp name> -filepath .\assets\apiapp.zip
+    ```
 
 3. Build applications
 
-App packages are provided in [assets](./assests) directory. However, you can build applications in case you have modified application source.
+    App packages are provided in [assets](./assests) directory. However, you can build applications in case you have modified application source.
 
-- api app
-    ```
-    cd src\apiapp
-    dotnet publish -c Release -o out apiapp.csproj
-    Compress-Archive -Path out\* -DestinationPath ..\..\assets\apiapp.zip -Force
-    ```
-
-- function app #1 (eh)
-    > you need to install extension in your function app
-
-    ```
-    cd src
-    dotnet build fxeh\extensions.csproj -o fxeh\bin --no-incremental
-    Remove-Item fxeh\obj
-    Compress-Archive -Path fxeh\* -DestinationPath ..\assets\fxeh.zip -Force
-    ```
-
-- function app #2 (http)
-    ```
-    cd src
-    Compress-Archive -Path fxapp\* -DestinationPath ..\assets\fxapp.zip -Force
+    - api app
         ```
+        cd src\apiapp
+        dotnet publish -c Release -o out apiapp.csproj
+        Compress-Archive -Path out\* -DestinationPath ..\..\assets\apiapp.zip -Force
+        ```
+
+    - function app #1 (eh)
+        > you need to install extension in your function app, see [documentation](https://docs.microsoft.com/en-us/azure/azure-functions/install-update-binding-extensions-manual)
+
+        ```
+        cd src
+        dotnet build fxeh\extensions.csproj -o fxeh\bin --no-incremental
+        Remove-Item fxeh\obj
+        Compress-Archive -Path fxeh\* -DestinationPath ..\assets\fxeh.zip -Force
+        ```
+
+    - function app #2 (http)
+        ```
+        cd src
+        Compress-Archive -Path fxapp\* -DestinationPath ..\assets\fxapp.zip -Force
+        ```
+
 ## Test
 
 1. Test event (upstream)
 
-Go to [src.ehsim](./src/ehsim) and update `connectionString` of event hub that you just provisioned.
+Go to [src/simeh](./src/simeh) and update `connectionString` of event hub that you just provisioned.
 
 Run event simulator.
 
@@ -85,20 +87,25 @@ curl.exe -X GET https://<sitename>.azurewebsites.net/api/events
 
 ```
 
-## Tips & Troubleshooting
+## Tips
 
 There are several ways to work around if terraform does not support Azure features.
 
-- Using ARM template: Deploying webapp or functions app
-- local_exec: Run commands locally. e.g., webapp zip deployment
+- Using _ARM template_ for deploying webapp or functions app
+- Using terraform `local_exec` for running commands locally. _e.g., sqlcmd, webapp zip deployment_
+
+## Troubleshooting
+
+Sometimes, provisioning takes several minutes and it's still running. In that case, cancel the task and run it again. 
 
 ## References
 
 ### Terraform
+
 - Terraform Azure provider: https://www.terraform.io/docs/providers/azurerm/index.html
 - Template deployment:https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html
-- `file` function:https://www.terraform.io/docs/configuration/functions/file.html
-- HTTP data: https://www.terraform.io/docs/providers/http/data_source.html
+- `file` function: https://www.terraform.io/docs/configuration/functions/file.html
+- HTTP data source: https://www.terraform.io/docs/providers/http/data_source.html
 
 ### Azure App Svc/Fx
 

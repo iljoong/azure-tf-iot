@@ -5,11 +5,6 @@ param(
     [string]$appname,
     [string]$filepath
 )
-<#
-$username = '$sktdemotffxeh'
-$password = "3nzQ9M47zvarwm1Rmv8Fo57fZxnQWfsocxZxCrTzRZQYfl0yXBtgHP3zP1Fg"
-$apiUrl = "https://sktdemotffxeh.scm.azurewebsites.net/api/zipdeploy"
-#>
 
 $apiUrl = "https://$appname.scm.azurewebsites.net/api/zipdeploy"
 

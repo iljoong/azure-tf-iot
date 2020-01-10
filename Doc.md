@@ -5,7 +5,7 @@
 Deploy [tf_fxurl](./tf_fxurl) and update `variables.tf`.
 Run `terraform` as following.
 
-> Tested in the latest __Windows 10__ environment. You need to install [odbc driver](https://www.microsoft.com/en-us/download/confirmation.aspx?id=56567) and [sqlcmd](https://docs.microsoft.com/en-us/sql/tools/sqlcmd-utility?view=sql-server-ver15) tool in your PC to run successfully.
+> Tested in the latest __Windows 10__ environment. You need to install [odbc driver](https://www.microsoft.com/en-us/download/confirmation.aspx?id=56567) and [sqlcmd](https://docs.microsoft.com/en-us/sql/tools/sqlcmd-utility?view=sql-server-ver15) tool in your PC to run successfully. You may use Azure Shell if you don't want to install any SW.
 
 ```
 terraform init
